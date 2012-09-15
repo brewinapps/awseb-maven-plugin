@@ -35,6 +35,9 @@ public class DeployMojo extends AbstractMojo
 	private String secretKey;
 	@MojoParameter(expression="${awseb.s3Bucket}", required=true)
 	private String s3Bucket;
+	@MojoParameter(expression="${awseb.endpoint}", 
+			defaultValue="elasticbeanstalk.eu-west-1.amazonaws.com", required=true)
+	private String endpoint;
 	@MojoParameter(expression="${awseb.s3Key}", 
 			defaultValue="${project.build.finalName}-${maven.build.timestamp}.${project.packaging}")
 	private String s3Key;	
@@ -52,6 +55,9 @@ public class DeployMojo extends AbstractMojo
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
 		AWSElasticBeanstalkClient awsebClient = new AWSElasticBeanstalkClient(awsCredentials);
+		awsebClient.setEndpoint(endpoint);
+		
+		logger.info(String.format("Using endpoint: %s", endpoint));
 		
 		// Upload artifact
 		logger.info("Uploading artifact...");
@@ -83,19 +89,20 @@ public class DeployMojo extends AbstractMojo
 		S3Location sourceBundleLocation = new S3Location(s3Bucket, s3Key);
 		UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
 		
+		
 		// Create application version
 		logger.info("* Creating application version...");
 		CreateApplicationVersionRequest createApplicationVersionRequest = 
 				new CreateApplicationVersionRequest();
-		createApplicationVersionRequest.setApplicationName(applicationName);
-		createApplicationVersionRequest.setVersionLabel(versionLabel);
-		createApplicationVersionRequest.setSourceBundle(sourceBundleLocation);
+		createApplicationVersionRequest.withApplicationName(applicationName)
+			.withVersionLabel(versionLabel)
+			.withSourceBundle(sourceBundleLocation);
 		awsebClient.createApplicationVersion(createApplicationVersionRequest);
 		
 		// Update environment
 		logger.info("* Updating environment...");
-		updateEnvironmentRequest.setEnvironmentName(environmentName);
-		updateEnvironmentRequest.setVersionLabel(versionLabel);
+		updateEnvironmentRequest.withEnvironmentName(environmentName)
+			.withVersionLabel(versionLabel);
 		awsebClient.updateEnvironment(updateEnvironmentRequest);
 	}
 
