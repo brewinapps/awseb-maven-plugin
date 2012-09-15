@@ -1,4 +1,4 @@
-package com.brewinapps;
+package com.brewinapps.awseb;
 
 import java.io.File;
 import java.net.URL;
