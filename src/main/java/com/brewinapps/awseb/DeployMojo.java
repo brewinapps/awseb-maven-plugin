@@ -24,7 +24,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
  * @author Brewin' Apps AS
  */
 @MojoGoal("deploy")
-@MojoPhase("package")
+@MojoPhase("verify")
 public class DeployMojo extends AbstractMojo
 {
 	private Log logger = getLog();
