@@ -25,3 +25,6 @@ Example: execution
     -DbuildNumber=${PROMOTED_NUMBER} \
     -Dawseb.accessKey=xxx \
     -Dawseb.secretKey=xxx
+
+### License
+ios-maven-plugin is licensed under the Creative Commons 3.0 License. Details can be found in the file LICENSE.
