@@ -1,17 +1,5 @@
 package com.brewinapps.awseb;
 
-import java.io.File;
-import java.net.URL;
-
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
-import org.jfrog.maven.annomojo.annotations.MojoGoal;
-import org.jfrog.maven.annomojo.annotations.MojoParameter;
-import org.jfrog.maven.annomojo.annotations.MojoPhase;
-import org.joda.time.DateTime;
-
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.elasticbeanstalk.AWSElasticBeanstalkClient;
@@ -19,36 +7,45 @@ import com.amazonaws.services.elasticbeanstalk.model.CreateApplicationVersionReq
 import com.amazonaws.services.elasticbeanstalk.model.S3Location;
 import com.amazonaws.services.elasticbeanstalk.model.UpdateEnvironmentRequest;
 import com.amazonaws.services.s3.AmazonS3Client;
+import java.io.File;
+import java.net.URL;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.joda.time.DateTime;
 
 /**
  * @author Brewin' Apps AS
  */
-@MojoGoal("deploy")
-@MojoPhase("verify")
+@Mojo(name = "deploy", defaultPhase = LifecyclePhase.VERIFY)
 public class DeployMojo extends AbstractMojo
 {
-	private Log logger = getLog();
+	private final Log logger = getLog();
 
-	@MojoParameter(expression="${awseb.accessKey}", required=true)
+	@Parameter(property="awseb.accessKey", required=true)
 	private String accessKey;
-	@MojoParameter(expression="${awseb.secretKey}", required=true)
+	@Parameter(property="awseb.secretKey", required=true)
 	private String secretKey;
-	@MojoParameter(expression="${awseb.s3Bucket}", required=true)
+	@Parameter(property="awseb.s3Bucket", required=true)
 	private String s3Bucket;
-	@MojoParameter(expression="${awseb.endpoint}", 
+	@Parameter(property="awseb.endpoint", 
 			defaultValue="elasticbeanstalk.eu-west-1.amazonaws.com", required=true)
 	private String endpoint;
-	@MojoParameter(expression="${awseb.s3Key}", 
+	@Parameter(property="awseb.s3Key", 
 			defaultValue="${project.build.finalName}-${maven.build.timestamp}.${project.packaging}")
 	private String s3Key;	
-	@MojoParameter(expression="${awseb.applicationName}", required=true)
+	@Parameter(property="awseb.applicationName", required=true)
 	private String applicationName;
-	@MojoParameter(expression="${awseb.environmentName}", required=true)
+	@Parameter(property="awseb.environmentName", required=true)
 	private String environmentName;
-	@MojoParameter(expression="${awseb.artifact}", 
+	@Parameter(property="awseb.artifact", 
 			defaultValue="${project.build.directory}/${project.build.finalName}.${project.packaging}")
 	private File artifact;
-	@MojoParameter(expression="${awseb.versionLabel}",
+	@Parameter(property="awseb.versionLabel",
 			defaultValue="${project.version}-${maven.build.timestamp}")
 	private String versionLabel;
 	
